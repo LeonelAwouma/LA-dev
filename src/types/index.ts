@@ -26,6 +26,7 @@ export interface GameStore {
   fen: string;
   history: Move[];
   gameState: GameState;
+  isPaused: boolean;
   gameMode: GameMode;
   playerColor: 'w' | 'b';
   aiDifficulty: Difficulty;
@@ -40,6 +41,7 @@ export interface GameStore {
   setAiDifficulty: (difficulty: Difficulty) => void;
   setPieceStyle: (style: PieceStyle) => void;
   setIsThinking: (isThinking: boolean) => void;
+  togglePause: () => void;
   
   newGame: () => void;
   makeMove: (move: string | { from: Square, to: Square, promotion?: string }) => Move | null;

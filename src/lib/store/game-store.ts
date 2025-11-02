@@ -9,6 +9,7 @@ const useGameStore = create<GameStore>((set, get) => ({
   fen: INITIAL_FEN,
   history: [],
   gameState: 'ongoing',
+  isPaused: false,
   gameMode: 'pve',
   playerColor: 'w',
   aiDifficulty: 800,
@@ -31,6 +32,7 @@ const useGameStore = create<GameStore>((set, get) => ({
   setAiDifficulty: (difficulty: Difficulty) => set({ aiDifficulty: difficulty }),
   setPieceStyle: (style: PieceStyle) => set({ pieceStyle: style }),
   setIsThinking: (isThinking: boolean) => set({ isThinking }),
+  togglePause: () => set((state) => ({ isPaused: !state.isPaused })),
 
   newGame: () => {
     const newGame = new Chess();
@@ -39,6 +41,7 @@ const useGameStore = create<GameStore>((set, get) => ({
       fen: newGame.fen(),
       history: [],
       gameState: 'ongoing',
+      isPaused: false,
       lastMove: null,
       promotionDialogOpen: false,
     });
@@ -51,19 +54,21 @@ const useGameStore = create<GameStore>((set, get) => ({
     const legalMoves = game.moves({ verbose: true });
     const isMoveLegal = legalMoves.some(legalMove => {
       if (typeof move === 'string') {
+        // This handles both SAN ("Nf3") and UCI ("g1f3")
         return legalMove.san === move || `${legalMove.from}${legalMove.to}` === move;
       }
+      // This handles the object notation for moves
       return legalMove.from === move.from && legalMove.to === move.to;
     });
 
     if (!isMoveLegal) {
-      console.warn("Illegal move attempted:", move);
-      // Check if it's a promotion that chess.js needs help with
-      if (typeof move !== 'string' && get().isPromotion(move)) {
-          get().openPromotionDialog(move.from, move.to);
-          return null;
-      }
-      return null;
+        console.warn("Illegal move attempted:", move);
+        // This specific check is to handle cases where chess.js doesn't automatically detect pawn promotions
+        // in its standard .moves() output, requiring us to manage the promotion UI flow.
+        if (typeof move !== 'string' && get().isPromotion(move)) {
+            get().openPromotionDialog(move.from, move.to);
+        }
+        return null;
     }
     
     const result = game.move(move);
@@ -77,9 +82,6 @@ const useGameStore = create<GameStore>((set, get) => ({
         promotionDialogOpen: false,
         promotionMove: null,
       });
-    } else {
-        // This case should ideally not be reached if validation is correct
-        console.error("Move failed despite passing validation:", move);
     }
     return result;
   },

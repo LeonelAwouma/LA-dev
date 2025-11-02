@@ -12,7 +12,7 @@ const ranks = ['8', '7', '6', '5', '4', '3', '2', '1'];
 const files = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
 
 export function ChessBoard() {
-  const { fen, makeMove, getPiece, getLegalMoves, isPromotion, openPromotionDialog, lastMove, playerColor, getCurrentPlayer } = useGameStore();
+  const { fen, makeMove, getPiece, getLegalMoves, isPromotion, openPromotionDialog, lastMove, playerColor, getCurrentPlayer, isPaused } = useGameStore();
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
 
   const board = useMemo(() => {
@@ -45,7 +45,7 @@ export function ChessBoard() {
   }, [selectedSquare, getLegalMoves, fen]);
 
   const handleSquareClick = (square: Square) => {
-    if (getCurrentPlayer().type === 'ai') return;
+    if (getCurrentPlayer().type === 'ai' || isPaused) return;
     
     if (selectedSquare) {
       if (selectedSquare === square) {
@@ -96,7 +96,8 @@ export function ChessBoard() {
                 key={square}
                 onClick={() => handleSquareClick(square)}
                 className={cn(
-                  'relative flex h-[12.5%] w-[12.5%] items-center justify-center aspect-square cursor-pointer',
+                  'relative flex h-[12.5%] w-[12.5%] items-center justify-center aspect-square',
+                  {'cursor-pointer': !isPaused},
                   isLight ? 'bg-board-light-square' : 'bg-board-dark-square',
                   isSelected && 'bg-accent/70',
                   isLastMove && 'bg-accent/40'
