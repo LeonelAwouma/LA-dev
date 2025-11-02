@@ -4,12 +4,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { generateGameTheme } from "@/lib/actions";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { Wand2 } from "lucide-react";
+import { SidebarGroup, SidebarGroupContent, SidebarGroupLabel } from "../ui/sidebar";
 
 const formSchema = z.object({
   themeDescription: z.string().min(10, "Please describe the theme in at least 10 characters."),
@@ -31,15 +31,17 @@ export function ThemeGenerator() {
     try {
       const result = await generateGameTheme(values);
       if (result.success && result.theme) {
-        document.documentElement.style.setProperty('--background', result.theme.background);
-        document.documentElement.style.setProperty('--primary', result.theme.primary);
-        document.documentElement.style.setProperty('--board-dark-square', `hsl(${result.theme.primary})`);
-
-        const primaryHsl = result.theme.primary.split(' ').map(parseFloat);
-        const lightSquareHsl = `hsl(${primaryHsl[0]}, ${primaryHsl[1]}%, ${Math.min(100, primaryHsl[2] + 30)}%)`;
-        document.documentElement.style.setProperty('--board-light-square', lightSquareHsl);
+        const root = document.documentElement;
+        root.style.setProperty('--background', `hsl(${result.theme.background})`);
+        root.style.setProperty('--foreground', `hsl(${result.theme.foreground})`);
+        root.style.setProperty('--primary', `hsl(${result.theme.primary})`);
+        root.style.setProperty('--accent', `hsl(${result.theme.accent})`);
+        root.style.setProperty('--card', `hsl(${result.theme.card})`);
+        root.style.setProperty('--board-dark-square', `hsl(${result.theme.primary})`);
         
-        document.documentElement.style.setProperty('--accent', result.theme.accent);
+        const primaryHsl = result.theme.primary.split(' ').map(parseFloat);
+        const lightSquareHsl = `${primaryHsl[0]} ${primaryHsl[1]}% ${Math.min(100, primaryHsl[2] + 30)}%`;
+        root.style.setProperty('--board-light-square', `hsl(${lightSquareHsl})`);
 
         toast({
           title: "Theme Applied!",
@@ -64,20 +66,16 @@ export function ThemeGenerator() {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>AI Theme Generator</CardTitle>
-        <CardDescription>Describe a theme and let AI create it.</CardDescription>
-      </CardHeader>
-      <CardContent>
+    <SidebarGroup>
+      <SidebarGroupLabel>AI Theme Generator</SidebarGroupLabel>
+      <SidebarGroupContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
             <FormField
               control={form.control}
               name="themeDescription"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Theme Description</FormLabel>
                   <FormControl>
                     <Input placeholder="e.g., 'A futuristic space theme'" {...field} />
                   </FormControl>
@@ -85,13 +83,13 @@ export function ThemeGenerator() {
                 </FormItem>
               )}
             />
-            <Button type="submit" disabled={isGenerating} className="w-full">
+            <Button type="submit" disabled={isGenerating} className="w-full" size="sm">
               <Wand2 />
               {isGenerating ? 'Generating...' : 'Generate Theme'}
             </Button>
           </form>
         </Form>
-      </CardContent>
-    </Card>
+      </SidebarGroupContent>
+    </SidebarGroup>
   );
 }

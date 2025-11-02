@@ -80,7 +80,7 @@ export function ChessBoard() {
   };
 
   return (
-    <div className="relative aspect-square w-full max-w-[calc(100vh-12rem)] mx-auto shadow-2xl rounded-md overflow-hidden border-4 border-card">
+    <div className="relative aspect-square w-full max-w-[calc(100vh-16rem)] mx-auto shadow-2xl rounded-md overflow-hidden border-4 border-card">
       {orientedRanks.map((rank, rowIndex) => (
         <div key={rank} className="flex">
           {orientedFiles.map((file, colIndex) => {
@@ -96,7 +96,7 @@ export function ChessBoard() {
                 key={square}
                 onClick={() => handleSquareClick(square)}
                 className={cn(
-                  'relative flex h-[12.5%] w-[12.5%] items-center justify-center aspect-square',
+                  'relative flex h-full w-full items-center justify-center aspect-square',
                   {'cursor-pointer': !isPaused},
                   isLight ? 'bg-board-light-square' : 'bg-board-dark-square',
                   isSelected && 'bg-accent/70',

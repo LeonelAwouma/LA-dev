@@ -21,14 +21,13 @@ export type GameThemeInput = z.infer<typeof GameThemeInputSchema>;
 const GameThemeOutputSchema = z.object({
   colorPalette: z
     .object({
-      primaryColor: z.string().describe('The primary color of the theme (e.g., #2c3e50).'),
-      backgroundColor: z.string().describe('The background color of the theme (e.g., #222222).'),
-      accentColor: z.string().describe('The accent color for highlighting elements (e.g., #FFD700).'),
+      primary: z.string().describe('The primary color for UI elements like buttons and highlights, in HSL format (e.g., "210 29% 24%").'),
+      background: z.string().describe('The main background color of the app, in HSL format (e.g., "0 0% 13.3%").'),
+      accent: z.string().describe('The accent color for highlights and call-to-actions, in HSL format (e.g., "51 100% 50%").'),
+      card: z.string().describe('The background color for card elements, in HSL format (e.g., "210 29% 18%").'),
+      foreground: z.string().describe('The primary text color, in HSL format (e.g., "0 0% 98%").'),
     })
-    .describe('The color palette for the chessboard theme.'),
-  pieceStyle: z
-    .enum(['Classic', 'Modern', 'Colorful'])
-    .describe('The suggested piece style for the theme.'),
+    .describe('The HSL color palette for the app theme.'),
 });
 export type GameThemeOutput = z.infer<typeof GameThemeOutputSchema>;
 
@@ -40,12 +39,20 @@ const prompt = ai.definePrompt({
   name: 'generateGameThemePrompt',
   input: {schema: GameThemeInputSchema},
   output: {schema: GameThemeOutputSchema},
-  prompt: `You are a theme generator for a chess game. You will generate a color palette (primaryColor, backgroundColor, and accentColor) and suggest a piece style (Classic, Modern, or Colorful) that matches the user's described theme.
+  prompt: `You are a theme generator for a chess web app. Your task is to generate a harmonious and accessible color palette based on a user's theme description. The palette must be suitable for a modern, dark-themed interface.
 
-  Theme description: {{{themeDescription}}}
+  **Theme Description:**
+  "{{{themeDescription}}}"
 
-  Respond with a JSON object.
-  Ensure the color palette is a set of valid hexadecimal color codes.
+  **Instructions:**
+  1.  Generate five colors in HSL format (e.g., "210 29% 24%").
+  2.  **Primary Color:** This will be used for the dark squares on the chessboard and for some UI elements. It should be a mid-to-dark tone.
+  3.  **Background Color:** This is the main app background. It must be a very dark color to ensure a good dark mode experience.
+  4.  **Accent Color:** A bright, vibrant color for highlights, selected state, and call-to-actions.
+  5.  **Card Color:** A color for card backgrounds, slightly lighter than the main background but still dark.
+  6.  **Foreground Color:** The main text color. It should be very light (almost white) to have high contrast against the dark backgrounds.
+
+  Ensure the generated palette is aesthetically pleasing and provides good contrast for readability.
 `,
 });
 
