@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import useGameStore from '@/lib/store/game-store';
-import { suggestMoveWithAnalysis } from '@/lib/actions';
+import { suggestMoveWithAnalysis } from '@/ai/flows/suggest-move-with-analysis';
 
 import { ChessBoard } from './chess-board';
 import { PlayerInfo } from './player-info';
@@ -10,7 +10,6 @@ import { GameOverDialog } from './game-over-dialog';
 import { PromotionDialog } from './promotion-dialog';
 import { Card, CardContent } from '@/components/ui/card';
 import { Pause } from 'lucide-react';
-import { SidebarTrigger } from '../ui/sidebar';
 
 export default function ChessGame() {
   const {
@@ -32,19 +31,15 @@ export default function ChessGame() {
         setIsThinking(true);
         try {
           const response = await suggestMoveWithAnalysis({ fen, difficulty: aiDifficulty });
-          if (response.success && response.data) {
-            makeMove(response.data.move);
-          } else {
-            console.error("AI move failed:", response.error);
-            const game = useGameStore.getState().game;
-            const moves = game.moves();
-            if (moves.length > 0) {
-              const randomMove = moves[Math.floor(Math.random() * moves.length)];
-              makeMove(randomMove);
-            }
-          }
+          makeMove(response.move);
         } catch (error) {
           console.error("Error during AI move:", error);
+           const game = useGameStore.getState().game;
+           const moves = game.moves();
+           if (moves.length > 0) {
+             const randomMove = moves[Math.floor(Math.random() * moves.length)];
+             makeMove(randomMove);
+           }
         } finally {
           setIsThinking(false);
         }
@@ -56,12 +51,12 @@ export default function ChessGame() {
 
 
   return (
-    <div className="w-full max-w-4xl mx-auto flex flex-col items-center gap-4">
-        <div className="hidden md:flex justify-between items-center w-full">
+    <div className="w-full mx-auto flex flex-col items-center gap-4">
+        <div className="flex justify-between items-center w-full">
             <PlayerInfo playerType={gameMode === 'pve' ? (useGameStore.getState().playerColor === 'b' ? 'ai' : 'human') : 'human'} color="black" />
-            <div className="text-center">
+             <div className="text-center">
                 <p className="text-lg font-semibold">{gameState !== 'ongoing' ? 'Game Over' : `${useGameStore.getState().game.turn() === 'w' ? "White" : "Black"}'s turn`}</p>
-                {isThinking && <p className="text-sm text-accent animate-pulse">AI is thinking...</p>}
+                {isThinking && <p className="text-sm text-blue-500 animate-pulse">AI is thinking...</p>}
             </div>
             <PlayerInfo playerType={gameMode === 'pve' ? (useGameStore.getState().playerColor === 'w' ? 'human' : 'ai') : 'human'} color="white" />
         </div>
@@ -76,15 +71,6 @@ export default function ChessGame() {
             )}
         </div>
       
-        <div className="md:hidden flex justify-between items-center w-full">
-            <PlayerInfo playerType={gameMode === 'pve' ? (useGameStore.getState().playerColor === 'b' ? 'ai' : 'human') : 'human'} color="black" />
-            <div className="text-center">
-                <p className="text-lg font-semibold">{gameState !== 'ongoing' ? 'Game Over' : `${useGameStore.getState().game.turn() === 'w' ? "White" : "Black"}'s turn`}</p>
-                {isThinking && <p className="text-sm text-accent animate-pulse">AI is thinking...</p>}
-            </div>
-            <PlayerInfo playerType={gameMode === 'pve' ? (useGameStore.getState().playerColor === 'w' ? 'human' : 'ai') : 'human'} color="white" />
-        </div>
-
       <GameOverDialog />
       <PromotionDialog />
     </div>

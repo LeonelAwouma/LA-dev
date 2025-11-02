@@ -41,7 +41,8 @@ export function ChessBoard() {
   
   const legalMovesForSelected = useMemo(() => {
     if (!selectedSquare) return new Set();
-    return new Set(getLegalMoves(selectedSquare).map(move => move.to));
+    const moves = getLegalMoves(selectedSquare);
+    return new Set(moves.map(move => move.to));
   }, [selectedSquare, getLegalMoves, fen]);
 
   const handleSquareClick = (square: Square) => {
@@ -80,7 +81,7 @@ export function ChessBoard() {
   };
 
   return (
-    <div className="relative aspect-square w-full max-w-[calc(100vh-16rem)] mx-auto shadow-2xl rounded-md overflow-hidden border-4 border-card">
+    <div className="relative aspect-square w-full max-w-[calc(100vh-16rem)] mx-auto shadow-2xl rounded-lg overflow-hidden border-4 border-card">
       {orientedRanks.map((rank, rowIndex) => (
         <div key={rank} className="flex">
           {orientedFiles.map((file, colIndex) => {
@@ -99,8 +100,8 @@ export function ChessBoard() {
                   'relative flex h-full w-full items-center justify-center aspect-square',
                   {'cursor-pointer': !isPaused},
                   isLight ? 'bg-board-light-square' : 'bg-board-dark-square',
-                  isSelected && 'bg-accent/70',
-                  isLastMove && 'bg-accent/40'
+                  isSelected && 'bg-blue-400/70',
+                  isLastMove && 'bg-blue-400/40'
                 )}
               >
                 {piece && <Piece piece={piece} />}
@@ -112,12 +113,12 @@ export function ChessBoard() {
                   >
                     <div className={cn(
                       "rounded-full",
-                      getPiece(square) ? 'w-full h-full border-8 border-accent/50' : 'w-1/3 h-1/3 bg-accent/50'
+                      getPiece(square) ? 'w-full h-full border-8 border-blue-500/50' : 'w-1/3 h-1/3 bg-blue-500/50'
                     )}></div>
                   </motion.div>
                 )}
-                {(rowIndex === 7) && <span className={cn("absolute bottom-1 left-1 text-xs font-bold", isLight ? "text-board-dark-square" : "text-board-light-square")}>{file}</span>}
-                {(colIndex === 0) && <span className={cn("absolute top-1 right-1 text-xs font-bold", isLight ? "text-board-dark-square" : "text-board-light-square")}>{rank}</span>}
+                {(playerColor === 'w' ? rowIndex === 7 : rowIndex === 0) && <span className={cn("absolute bottom-1 left-1 text-xs font-bold", isLight ? "text-board-dark-square" : "text-board-light-square")}>{file}</span>}
+                {(playerColor === 'w' ? colIndex === 0 : colIndex === 7) && <span className={cn("absolute top-1 right-1 text-xs font-bold", isLight ? "text-board-dark-square" : "text-board-light-square")}>{rank}</span>}
               </div>
             );
           })}

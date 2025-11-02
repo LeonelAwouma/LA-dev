@@ -60,8 +60,8 @@ export function GameOverDialog() {
     <AlertDialog open={isOpen}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <div className="flex justify-center items-center w-16 h-16 rounded-full bg-accent/20 mx-auto mb-4">
-              <Icon className="w-8 h-8 text-accent"/>
+          <div className="flex justify-center items-center w-16 h-16 rounded-full bg-blue-100 mx-auto mb-4">
+              <Icon className="w-8 h-8 text-blue-500"/>
           </div>
           <AlertDialogTitle className="text-center text-2xl font-headline">{title}</AlertDialogTitle>
           <AlertDialogDescription className="text-center">
@@ -69,7 +69,7 @@ export function GameOverDialog() {
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogAction onClick={newGame} className="w-full">
+          <AlertDialogAction onClick={newGame} className="w-full bg-blue-500 hover:bg-blue-600 text-white">
             Play Again
           </AlertDialogAction>
         </AlertDialogFooter>

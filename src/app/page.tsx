@@ -1,37 +1,39 @@
 import ChessGame from '@/components/chess/chess-game';
-import { AppLogo } from '@/components/icons';
-import { Sidebar, SidebarContent, SidebarHeader, SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
-import { Button } from '@/components/ui/button';
 import { GameControls } from '@/components/chess/game-controls';
 import { MoveHistory } from '@/components/chess/move-history';
-import { ThemeGenerator } from '@/components/chess/theme-generator';
+import { Button } from '@/components/ui/button';
+import { Github, Languages, Settings } from 'lucide-react';
+import { PlayerInfo } from '@/components/chess/player-info';
+import useGameStore from '@/lib/store/game-store';
+
 
 export default function Home() {
+
   return (
-    <SidebarProvider>
-      <Sidebar>
-        <SidebarHeader>
-          <div className="flex items-center gap-2">
-            <AppLogo className="w-8 h-8 text-accent" />
-            <h2 className="text-lg font-headline font-semibold">Stockfish Champion</h2>
+    <div className="flex flex-col min-h-screen bg-background">
+      <header className="flex items-center justify-between p-4 border-b">
+        <div className="flex items-center gap-4">
+          <h1 className="text-2xl font-bold font-headline">Chess Game</h1>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm"><Languages className="w-4 h-4 mr-2" />EN</Button>
+          <Button variant="outline" size="sm">
+            <Github className="w-4 h-4 mr-2" />
+            GitHub
+          </Button>
+        </div>
+      </header>
+      <main className="flex-1 w-full p-4 md:p-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+          <div className="lg:col-span-2">
+            <ChessGame />
           </div>
-        </SidebarHeader>
-        <SidebarContent>
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-6">
             <GameControls />
             <MoveHistory />
-            <ThemeGenerator />
           </div>
-        </SidebarContent>
-      </Sidebar>
-      <SidebarInset>
-        <main className="flex min-h-screen w-full flex-col items-center justify-center p-4 md:p-8 relative">
-            <div className="absolute top-4 left-4 md:hidden">
-              <SidebarTrigger />
-            </div>
-            <ChessGame />
-        </main>
-      </SidebarInset>
-    </SidebarProvider>
+        </div>
+      </main>
+    </div>
   );
 }
