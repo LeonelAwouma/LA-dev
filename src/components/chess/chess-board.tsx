@@ -42,7 +42,7 @@ export function ChessBoard() {
   const legalMovesForSelected = useMemo(() => {
     if (!selectedSquare) return new Set();
     return new Set(getLegalMoves(selectedSquare).map(move => move.to));
-  }, [selectedSquare, getLegalMoves]);
+  }, [selectedSquare, getLegalMoves, fen]);
 
   const handleSquareClick = (square: Square) => {
     if (getCurrentPlayer().type === 'ai') return;
@@ -53,21 +53,22 @@ export function ChessBoard() {
         return;
       }
       
-      const isLegalMove = getLegalMoves(selectedSquare).some(move => move.to === square);
-
-      if (isLegalMove) {
-        if (isPromotion({ from: selectedSquare, to: square })) {
+      const move = { from: selectedSquare, to: square };
+      if (isPromotion(move)) {
           openPromotionDialog(selectedSquare, square);
-        } else {
-          makeMove({ from: selectedSquare, to: square });
-        }
-        setSelectedSquare(null);
-      } else {
-        const piece = getPiece(square);
-        if (piece && piece.color === getCurrentPlayer().color) {
-          setSelectedSquare(square);
-        } else {
           setSelectedSquare(null);
+      } else {
+        const result = makeMove(move);
+        if (result) {
+          setSelectedSquare(null);
+        } else {
+          // If move was not successful, check if the clicked square has a friendly piece
+          const piece = getPiece(square);
+          if (piece && piece.color === getCurrentPlayer().color) {
+            setSelectedSquare(square);
+          } else {
+            setSelectedSquare(null);
+          }
         }
       }
     } else {

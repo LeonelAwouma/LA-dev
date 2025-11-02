@@ -46,27 +46,42 @@ const useGameStore = create<GameStore>((set, get) => ({
 
   makeMove: (move: string | { from: Square; to: Square; promotion?: string }) => {
     const game = get().game;
-    const currentFen = game.fen();
     
-    try {
-      const result = game.move(move);
-      if (result) {
-        set({
-          fen: game.fen(),
-          history: game.history({ verbose: true }) as Move[],
-          gameState: get().getGameState(game),
-          lastMove: { from: result.from, to: result.to },
-          promotionDialogOpen: false,
-          promotionMove: null,
-        });
-        return result;
+    // Validate the move before making it
+    const legalMoves = game.moves({ verbose: true });
+    const isMoveLegal = legalMoves.some(legalMove => {
+      if (typeof move === 'string') {
+        return legalMove.san === move || `${legalMove.from}${legalMove.to}` === move;
       }
-    } catch (error) {
-      console.warn("Invalid move attempted:", move);
-      game.load(currentFen); // Revert to previous state
-      set({ fen: currentFen }); // Ensure store is in sync
+      return legalMove.from === move.from && legalMove.to === move.to;
+    });
+
+    if (!isMoveLegal) {
+      console.warn("Illegal move attempted:", move);
+      // Check if it's a promotion that chess.js needs help with
+      if (typeof move !== 'string' && get().isPromotion(move)) {
+          get().openPromotionDialog(move.from, move.to);
+          return null;
+      }
+      return null;
     }
-    return null;
+    
+    const result = game.move(move);
+    
+    if (result) {
+      set({
+        fen: game.fen(),
+        history: game.history({ verbose: true }) as Move[],
+        gameState: get().getGameState(game),
+        lastMove: { from: result.from, to: result.to },
+        promotionDialogOpen: false,
+        promotionMove: null,
+      });
+    } else {
+        // This case should ideally not be reached if validation is correct
+        console.error("Move failed despite passing validation:", move);
+    }
+    return result;
   },
 
   getGameState: (game: Chess): GameState => {
@@ -90,8 +105,14 @@ const useGameStore = create<GameStore>((set, get) => ({
     const piece = get().game.get(move.from);
     if (!piece) return false;
     if (piece.type !== 'p') return false;
-    if (piece.color === 'w' && move.from[1] === '7' && move.to[1] === '8') return true;
-    if (piece.color === 'b' && move.from[1] === '2' && move.to[1] === '1') return true;
+    const promotionRank = piece.color === 'w' ? '8' : '1';
+    const startRank = piece.color === 'w' ? '7' : '2';
+
+    if (move.from[1] === startRank && move.to[1] === promotionRank) {
+       // Also check if the move is generally legal (ignoring promotion piece)
+       const legalMoves = get().game.moves({square: move.from, verbose: true});
+       return legalMoves.some(m => m.to === move.to);
+    }
     return false;
   },
 
@@ -104,9 +125,9 @@ const useGameStore = create<GameStore>((set, get) => ({
   },
 
   handlePromotion: (promotionPiece: 'q' | 'r' | 'b' | 'n') => {
-    const { promotionMove } = get();
+    const { promotionMove, makeMove } = get();
     if (promotionMove) {
-      get().makeMove({ ...promotionMove, promotion: promotionPiece });
+      makeMove({ ...promotionMove, promotion: promotionPiece });
     }
   },
 
