@@ -26,6 +26,8 @@ const GameThemeOutputSchema = z.object({
       accent: z.string().describe('The accent color for highlights and call-to-actions, in HSL format (e.g., "51 100% 50%").'),
       card: z.string().describe('The background color for card elements, in HSL format (e.g., "210 29% 18%").'),
       foreground: z.string().describe('The primary text color, in HSL format (e.g., "0 0% 98%").'),
+      sidebarBackground: z.string().describe('The background color for the sidebar, in HSL format (e.g., "240 5.9% 10%").'),
+      sidebarForeground: z.string().describe('The text color for the sidebar, in HSL format (e.g., "240 4.8% 95.9%").'),
     })
     .describe('The HSL color palette for the app theme.'),
 });
@@ -45,12 +47,14 @@ const prompt = ai.definePrompt({
   "{{{themeDescription}}}"
 
   **Instructions:**
-  1.  Generate five colors in HSL format (e.g., "210 29% 24%").
+  1.  Generate seven colors in HSL format (e.g., "210 29% 24%").
   2.  **Primary Color:** This will be used for the dark squares on the chessboard and for some UI elements. It should be a mid-to-dark tone.
   3.  **Background Color:** This is the main app background. It must be a very dark color to ensure a good dark mode experience.
   4.  **Accent Color:** A bright, vibrant color for highlights, selected state, and call-to-actions.
   5.  **Card Color:** A color for card backgrounds, slightly lighter than the main background but still dark.
   6.  **Foreground Color:** The main text color. It should be very light (almost white) to have high contrast against the dark backgrounds.
+  7.  **Sidebar Background Color:** The background for the sidebar. It should be a very dark color, often similar to or slightly different from the main background.
+  8.  **Sidebar Foreground Color:** The text color for the sidebar. It should be very light to contrast with the sidebar background.
 
   Ensure the generated palette is aesthetically pleasing and provides good contrast for readability.
 `,

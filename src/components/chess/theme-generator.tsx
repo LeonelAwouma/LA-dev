@@ -37,8 +37,18 @@ export function ThemeGenerator() {
         root.style.setProperty('--primary', `hsl(${result.theme.primary})`);
         root.style.setProperty('--accent', `hsl(${result.theme.accent})`);
         root.style.setProperty('--card', `hsl(${result.theme.card})`);
-        root.style.setProperty('--board-dark-square', `hsl(${result.theme.primary})`);
         
+        // Sidebar colors
+        root.style.setProperty('--sidebar-background', `hsl(${result.theme.sidebarBackground})`);
+        root.style.setProperty('--sidebar-foreground', `hsl(${result.theme.sidebarForeground})`);
+        root.style.setProperty('--sidebar-border', `hsl(${result.theme.sidebarBackground})`);
+        const sidebarBgHsl = result.theme.sidebarBackground.split(' ').map(parseFloat);
+        const sidebarAccentHsl = `${sidebarBgHsl[0]} ${sidebarBgHsl[1]}% ${Math.min(100, sidebarBgHsl[2] + 5)}%`;
+        root.style.setProperty('--sidebar-accent', `hsl(${sidebarAccentHsl})`);
+
+
+        // Board colors
+        root.style.setProperty('--board-dark-square', `hsl(${result.theme.primary})`);
         const primaryHsl = result.theme.primary.split(' ').map(parseFloat);
         const lightSquareHsl = `${primaryHsl[0]} ${primaryHsl[1]}% ${Math.min(100, primaryHsl[2] + 30)}%`;
         root.style.setProperty('--board-light-square', `hsl(${lightSquareHsl})`);
