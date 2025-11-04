@@ -17,7 +17,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { difficulties, GameMode, Difficulty } from '@/types';
 import { Users, Bot, RefreshCw, Play, Pause, Timer } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Separator } from '../ui/separator';
@@ -77,27 +76,31 @@ export function GameControls() {
             </div>
           </div>
           {gameMode === 'pve' && (
-            <div className="space-y-2">
-              <Label>Your Color</Label>
-              <div className="grid grid-cols-2 gap-2">
-                <Button
-                  variant={playerColor === 'w' ? 'secondary' : 'outline'}
-                  className="flex-1"
-                  onClick={() => setPlayerColor('w')}
-                  disabled={gameInProgress}
-                >
-                  White
-                </Button>
-                <Button
-                  variant={playerColor === 'b' ? 'secondary' : 'outline'}
-                  className="flex-1"
-                  onClick={() => setPlayerColor('b')}
-                  disabled={gameInProgress}
-                >
-                  Black
-                </Button>
+            <>
+              <div className="space-y-2">
+                <Label>Your Color</Label>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button
+                    variant={playerColor === 'w' ? 'secondary' : 'outline'}
+                    className="flex-1"
+                    onClick={() => setPlayerColor('w')}
+                    disabled={gameInProgress}
+                  >
+                    White
+                  </Button>
+                  <Button
+                    variant={playerColor === 'b' ? 'secondary' : 'outline'}
+                    className="flex-1"
+                    onClick={() => setPlayerColor('b')}
+                    disabled={gameInProgress}
+                  >
+                    Black
+                  </Button>
+                </div>
               </div>
-            </div>
+              <Separator />
+              <AIDifficultySelector disabled={gameInProgress} />
+            </>
           )}
           <Separator />
            <div className="space-y-2">
@@ -128,8 +131,6 @@ export function GameControls() {
           </Button>
         </CardContent>
       </Card>
-      
-      <AIDifficultySelector disabled={gameInProgress} />
 
       {gameInProgress && (
         <Card>
