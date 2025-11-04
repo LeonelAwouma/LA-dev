@@ -18,9 +18,11 @@ import {
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { difficulties, GameMode, Difficulty } from '@/types';
-import { Users, Bot, RefreshCw, Play, Pause, Settings, Timer } from 'lucide-react';
+import { Users, Bot, RefreshCw, Play, Pause, Timer } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Separator } from '../ui/separator';
+import AIDifficultySelector from './ai-difficulty-selector';
+
 
 export function GameControls() {
   const {
@@ -29,8 +31,6 @@ export function GameControls() {
     setGameMode,
     playerColor,
     setPlayerColor,
-    aiDifficulty,
-    setAiDifficulty,
     isThinking,
     isPaused,
     togglePause,
@@ -42,6 +42,8 @@ export function GameControls() {
   const handleNewGame = () => {
     newGame();
   }
+  
+  const gameInProgress = gameState === 'ongoing';
 
   return (
     <div className="flex flex-col gap-4">
@@ -57,7 +59,7 @@ export function GameControls() {
               <Button
                 variant={gameMode === 'pvp' ? 'secondary' : 'outline'}
                 onClick={() => setGameMode('pvp')}
-                disabled={isThinking || isPaused}
+                disabled={gameInProgress}
                 className={cn('h-16 flex-col', gameMode === 'pvp' && 'border-primary')}
               >
                 <Users className="w-5 h-5 mb-1" />
@@ -66,7 +68,7 @@ export function GameControls() {
               <Button
                 variant={gameMode === 'pve' ? 'secondary' : 'outline'}
                 onClick={() => setGameMode('pve')}
-                disabled={isThinking || isPaused}
+                disabled={gameInProgress}
                 className={cn('h-16 flex-col', gameMode === 'pve' && 'border-primary')}
               >
                 <Bot className="w-5 h-5 mb-1" />
@@ -75,7 +77,6 @@ export function GameControls() {
             </div>
           </div>
           {gameMode === 'pve' && (
-            <>
             <div className="space-y-2">
               <Label>Your Color</Label>
               <div className="grid grid-cols-2 gap-2">
@@ -83,7 +84,7 @@ export function GameControls() {
                   variant={playerColor === 'w' ? 'secondary' : 'outline'}
                   className="flex-1"
                   onClick={() => setPlayerColor('w')}
-                  disabled={isThinking || isPaused}
+                  disabled={gameInProgress}
                 >
                   White
                 </Button>
@@ -91,34 +92,12 @@ export function GameControls() {
                   variant={playerColor === 'b' ? 'secondary' : 'outline'}
                   className="flex-1"
                   onClick={() => setPlayerColor('b')}
-                  disabled={isThinking || isPaused}
+                  disabled={gameInProgress}
                 >
                   Black
                 </Button>
               </div>
             </div>
-            <div className="space-y-2">
-              <Label>AI Difficulty</Label>
-              <Select
-                value={aiDifficulty.toString()}
-                onValueChange={value =>
-                  setAiDifficulty(parseInt(value) as Difficulty)
-                }
-                disabled={isThinking || isPaused}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select difficulty" />
-                </SelectTrigger>
-                <SelectContent>
-                  {difficulties.map(level => (
-                    <SelectItem key={level} value={level.toString()}>
-                      Elo {level}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            </>
           )}
           <Separator />
            <div className="space-y-2">
@@ -126,7 +105,7 @@ export function GameControls() {
               <Select
                 value={timerDuration === Infinity ? "0" : timerDuration.toString()}
                 onValueChange={(value) => setTimerDuration(parseInt(value))}
-                disabled={isThinking || isPaused}
+                disabled={gameInProgress}
               >
                 <SelectTrigger>
                   <div className="flex items-center gap-2">
@@ -149,26 +128,30 @@ export function GameControls() {
           </Button>
         </CardContent>
       </Card>
+      
+      <AIDifficultySelector disabled={gameInProgress} />
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Game Actions</CardTitle>
-        </CardHeader>
-        <CardContent className="grid grid-cols-1 gap-2">
-          <Button
-            onClick={togglePause}
-            disabled={gameState !== 'ongoing'}
-            variant="outline"
-          >
-            {isPaused ? (
-              <Play className="mr-2 h-4 w-4" />
-            ) : (
-              <Pause className="mr-2 h-4 w-4" />
-            )}
-            {isPaused ? 'Resume' : 'Pause'}
-          </Button>
-        </CardContent>
-      </Card>
+      {gameInProgress && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Game Actions</CardTitle>
+          </CardHeader>
+          <CardContent className="grid grid-cols-1 gap-2">
+            <Button
+              onClick={togglePause}
+              disabled={gameState !== 'ongoing'}
+              variant="outline"
+            >
+              {isPaused ? (
+                <Play className="mr-2 h-4 w-4" />
+              ) : (
+                <Pause className="mr-2 h-4 w-4" />
+              )}
+              {isPaused ? 'Resume' : 'Pause'}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

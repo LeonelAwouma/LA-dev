@@ -1,7 +1,10 @@
 import type { Chess, Piece as ChessJSPiece, Square, Move as ChessJSMove } from 'chess.js';
+import { Brain } from 'lucide-react';
 
 export type Piece = ChessJSPiece;
 export type { Square };
+
+export type Icon = typeof Brain;
 
 export type PieceStyle = 'classic' | 'modern' | 'colorful';
 
