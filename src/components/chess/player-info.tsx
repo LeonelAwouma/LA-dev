@@ -19,7 +19,7 @@ function formatTime(seconds: number): string {
 }
 
 export function PlayerInfo({ playerType, color }: PlayerInfoProps) {
-  const { game, isThinking, timers } = useGameStore();
+  const { game, isThinking, timers, gameState } = useGameStore();
   const isTurn = (color === 'white' && game.turn() === 'w') || (color === 'black' && game.turn() === 'b');
   const currentPlayer = useGameStore.getState().getCurrentPlayer();
   const isPlayerThinking = isThinking && currentPlayer.color === color;
@@ -27,12 +27,14 @@ export function PlayerInfo({ playerType, color }: PlayerInfoProps) {
   const Icon = playerType === 'human' ? User : Bot;
   const PieceIcon = color === 'white' ? WhiteKing : BlackKing;
   const time = timers[color === 'white' ? 'w' : 'b'];
+  
+  const gameOver = gameState !== 'ongoing';
 
 
   return (
     <div className={cn(
       "flex items-center gap-3 p-2 rounded-lg transition-all w-full",
-      isTurn ? "bg-card" : "opacity-70"
+      isTurn && !gameOver ? "bg-card" : "opacity-70"
     )}>
       <div className="relative">
         <div className="w-10 h-10 flex items-center justify-center rounded-full bg-secondary">
