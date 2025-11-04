@@ -1,6 +1,7 @@
+
 "use client";
 
-import { useEffect } from 'react';
+import { useEffect, type RefObject } from 'react';
 import useGameStore from '@/lib/store/game-store';
 import { suggestMoveWithAnalysis } from '@/ai/flows/suggest-move-with-analysis';
 
@@ -11,7 +12,11 @@ import { PromotionDialog } from './promotion-dialog';
 import { Card, CardContent } from '@/components/ui/card';
 import { Pause } from 'lucide-react';
 
-export default function ChessGame() {
+interface ChessGameProps {
+  boardRef: RefObject<HTMLDivElement>;
+}
+
+export default function ChessGame({ boardRef }: ChessGameProps) {
   const {
     gameState,
     isPaused,
@@ -75,7 +80,7 @@ export default function ChessGame() {
             <PlayerInfo playerType={gameMode === 'pve' ? (useGameStore.getState().playerColor === 'w' ? 'human' : 'ai') : 'human'} color="white" />
         </div>
       
-        <div className="relative w-full">
+        <div className="relative w-full" ref={boardRef}>
             <ChessBoard />
             {isPaused && (
               <div className="absolute inset-0 bg-background/80 flex flex-col items-center justify-center gap-4 z-10 rounded-md">
