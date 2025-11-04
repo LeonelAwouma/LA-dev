@@ -1,5 +1,5 @@
 import type { Chess, Piece as ChessJSPiece, Square, Move as ChessJSMove } from 'chess.js';
-import { Brain } from 'lucide-react';
+import { Brain, Trophy, Crown, Award, TrendingUp, Zap } from 'lucide-react';
 import { TimeControl } from '@/lib/time-controls';
 
 export type Piece = ChessJSPiece;

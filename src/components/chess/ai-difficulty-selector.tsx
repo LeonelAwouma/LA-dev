@@ -5,6 +5,7 @@ import { Difficulty } from "@/types";
 import { Brain, Zap, TrendingUp, Award, Crown, Trophy } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Label } from "../ui/label";
+import { Card } from "../ui/card";
 
 interface AIDifficultySelectorProps {
   disabled?: boolean;
@@ -100,6 +101,18 @@ export default function AIDifficultySelector({
                 }
               `)}
             >
+              <div
+                  className={cn(`
+                    absolute -top-2 -right-2 px-2 py-0.5 rounded-full text-xs font-bold shadow-sm
+                    ${
+                      isSelected
+                        ? "bg-white text-gray-900"
+                        : `bg-gradient-to-r ${levelData.gradient} text-white`
+                    }
+                  `)}
+                >
+                  {levelData.level}
+                </div>
               <div className="flex flex-col items-center gap-1.5">
                 <div
                   className={cn(`
