@@ -46,7 +46,7 @@ export default function FullscreenButton({ boardRef }: FullscreenButtonProps) {
       onClick={toggleFullscreen}
       variant="outline"
       size="icon"
-      title={isFullscreen ? "Exit fullscreen" : "Fullscreen mode"}
+      title={isFullscreen ? "Quitter le plein écran" : "Mode plein écran"}
     >
       {isFullscreen ? (
         <Minimize className="w-4 h-4" />
