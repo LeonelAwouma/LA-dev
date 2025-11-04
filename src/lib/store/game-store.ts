@@ -44,7 +44,7 @@ const useGameStore = create<GameStore>((set, get) => ({
   setPieceStyle: (style: PieceStyle) => set({ pieceStyle: style }),
   setIsThinking: (isThinking: boolean) => set({ isThinking }),
   togglePause: () => set((state) => ({ isPaused: !state.isPaused })),
-  stopGame: () => set({ gameState: 'draw_repetition' }), // Using a draw state to stop game
+  stopGame: () => set({ gameState: 'stopped' }),
   setTimeControl: (timeControl: TimeControl) => {
     set({ timeControl });
     get().newGame();

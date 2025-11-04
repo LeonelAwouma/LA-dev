@@ -9,7 +9,7 @@ export type Icon = typeof Brain;
 
 export type PieceStyle = 'classic' | 'modern' | 'colorful';
 
-export type GameState = 'ongoing' | 'checkmate' | 'stalemate' | 'draw_repetition' | 'draw_insufficient' | 'draw_50move' | 'timeout';
+export type GameState = 'ongoing' | 'checkmate' | 'stalemate' | 'draw_repetition' | 'draw_insufficient' | 'draw_50move' | 'timeout' | 'stopped';
 
 export type Move = ChessJSMove;
 

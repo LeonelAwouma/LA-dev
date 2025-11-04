@@ -14,7 +14,7 @@ import { Trophy, Users, Timer } from 'lucide-react';
 
 export function GameOverDialog() {
   const { gameState, newGame, game, getMaterialAdvantage } = useGameStore();
-  const isOpen = gameState !== 'ongoing';
+  const isOpen = gameState !== 'ongoing' && gameState !== 'stopped';
 
   const getTitleAndDescription = () => {
     const turn = game.turn();

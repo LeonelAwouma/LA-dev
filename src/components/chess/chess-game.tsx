@@ -68,13 +68,14 @@ export default function ChessGame({ boardRef }: ChessGameProps) {
   }, [gameState, isPaused, tick]);
 
   const turn = game.turn();
+  const gameOver = gameState !== 'ongoing';
 
   return (
     <div className="w-full mx-auto flex flex-col items-center gap-4">
         <div className="flex justify-between items-center w-full">
             <PlayerInfo playerType={gameMode === 'pve' ? (useGameStore.getState().playerColor === 'b' ? 'ai' : 'human') : 'human'} color="black" />
              <div className="text-center">
-                <p className="text-lg font-semibold">{gameState !== 'ongoing' ? 'Game Over' : `${turn === 'w' ? "White" : "Black"}'s turn`}</p>
+                <p className="text-lg font-semibold">{gameOver ? 'Game Over' : `${turn === 'w' ? "White" : "Black"}'s turn`}</p>
                 {isThinking && <p className="text-sm text-blue-500 animate-pulse">AI is thinking...</p>}
             </div>
             <PlayerInfo playerType={gameMode === 'pve' ? (useGameStore.getState().playerColor === 'w' ? 'human' : 'ai') : 'human'} color="white" />
