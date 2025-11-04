@@ -91,7 +91,7 @@ export function GameControls() {
                 </div>
               </div>
               <Separator />
-              <AIDifficultySelector disabled={gameInProgress} />
+              <AIDifficultySelector disabled={false} />
             </>
           )}
           <Separator />
@@ -122,7 +122,7 @@ export function GameControls() {
               ) : (
                 <Pause className="mr-2 h-4 w-4" />
               )}
-              {isPaused ? 'Resume' : 'Pause'}
+              {isPaused ? 'Resume' : 'Stop'}
             </Button>
           </CardContent>
         </Card>

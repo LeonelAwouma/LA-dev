@@ -141,12 +141,6 @@ export default function AIDifficultySelector({
           );
         })}
       </div>
-
-      {disabled && (
-        <p className="text-xs text-muted-foreground text-center pt-2">
-            Cannot change difficulty during a game.
-        </p>
-      )}
     </div>
   );
 }
