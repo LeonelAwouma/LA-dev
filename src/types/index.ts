@@ -67,6 +67,7 @@ export interface GameStore {
   setPieceStyle: (style: PieceStyle) => void;
   setIsThinking: (isThinking: boolean) => void;
   togglePause: () => void;
+  stopGame: () => void;
   setTimeControl: (timeControl: TimeControl) => void;
   tick: () => void;
   getMaterialAdvantage: () => number;

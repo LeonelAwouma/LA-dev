@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Users, Bot, RefreshCw, Play, Pause } from 'lucide-react';
+import { Users, Bot, RefreshCw, Play, Pause, XCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Separator } from '../ui/separator';
 import AIDifficultySelector from './ai-difficulty-selector';
@@ -28,6 +28,7 @@ export function GameControls() {
     isPaused,
     togglePause,
     gameState,
+    stopGame,
   } = useGameStore();
 
   const handleNewGame = () => {
@@ -91,7 +92,7 @@ export function GameControls() {
                 </div>
               </div>
               <Separator />
-              <AIDifficultySelector disabled={false} />
+              <AIDifficultySelector disabled={gameInProgress} />
             </>
           )}
           <Separator />
@@ -122,7 +123,15 @@ export function GameControls() {
               ) : (
                 <Pause className="mr-2 h-4 w-4" />
               )}
-              {isPaused ? 'Resume' : 'Stop'}
+              {isPaused ? 'Resume' : 'Pause'}
+            </Button>
+            <Button
+              onClick={stopGame}
+              disabled={gameState !== 'ongoing'}
+              variant="destructive"
+            >
+              <XCircle className="mr-2 h-4 w-4" />
+              Stop Game
             </Button>
           </CardContent>
         </Card>
