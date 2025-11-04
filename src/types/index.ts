@@ -1,5 +1,6 @@
 import type { Chess, Piece as ChessJSPiece, Square, Move as ChessJSMove } from 'chess.js';
 import { Brain } from 'lucide-react';
+import { TimeControl } from '@/lib/time-controls';
 
 export type Piece = ChessJSPiece;
 export type { Square };
@@ -54,7 +55,7 @@ export interface GameStore {
   lastMove: { from: Square; to: Square } | null;
   promotionDialogOpen: boolean;
   promotionMove: { from: Square; to: Square } | null;
-  timerDuration: number;
+  timeControl: TimeControl;
   timers: { w: number, b: number };
   theme: Theme;
   soundEnabled: boolean;
@@ -66,7 +67,7 @@ export interface GameStore {
   setPieceStyle: (style: PieceStyle) => void;
   setIsThinking: (isThinking: boolean) => void;
   togglePause: () => void;
-  setTimerDuration: (duration: number) => void;
+  setTimeControl: (timeControl: TimeControl) => void;
   tick: () => void;
   getMaterialAdvantage: () => number;
   setTheme: (theme: Theme) => void;

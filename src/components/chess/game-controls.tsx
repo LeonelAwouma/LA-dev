@@ -9,18 +9,12 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { Users, Bot, RefreshCw, Play, Pause, Timer } from 'lucide-react';
+import { Users, Bot, RefreshCw, Play, Pause } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Separator } from '../ui/separator';
 import AIDifficultySelector from './ai-difficulty-selector';
+import TimeControlSelector from './time-control-selector';
 
 
 export function GameControls() {
@@ -34,8 +28,6 @@ export function GameControls() {
     isPaused,
     togglePause,
     gameState,
-    setTimerDuration,
-    timerDuration,
   } = useGameStore();
 
   const handleNewGame = () => {
@@ -105,25 +97,7 @@ export function GameControls() {
           <Separator />
            <div className="space-y-2">
               <Label>Time Control</Label>
-              <Select
-                value={timerDuration === Infinity ? "0" : timerDuration.toString()}
-                onValueChange={(value) => setTimerDuration(parseInt(value))}
-                disabled={gameInProgress}
-              >
-                <SelectTrigger>
-                  <div className="flex items-center gap-2">
-                    <Timer className="w-4 h-4 text-muted-foreground" />
-                    <SelectValue placeholder="Select time control" />
-                  </div>
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="60">1 minute</SelectItem>
-                  <SelectItem value="180">3 minutes</SelectItem>
-                  <SelectItem value="300">5 minutes</SelectItem>
-                  <SelectItem value="600">10 minutes</SelectItem>
-                  <SelectItem value="0">Unlimited</SelectItem>
-                </SelectContent>
-              </Select>
+              <TimeControlSelector gameStarted={gameInProgress} />
             </div>
           <Button onClick={handleNewGame} disabled={isThinking}>
             <RefreshCw className="mr-2 h-4 w-4" />

@@ -2,9 +2,10 @@ import { create } from 'zustand';
 import { Chess, Piece, Square } from 'chess.js';
 import type { GameState, GameStore, Move, PieceStyle, GameMode, Player, Difficulty, Theme } from '@/types';
 import { soundManager } from '@/lib/chess-sounds';
+import { TimeControl, TIME_CONTROLS } from '@/lib/time-controls';
 
 const INITIAL_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
-const DEFAULT_TIMER_DURATION = 300; // 5 minutes
+const DEFAULT_TIME_CONTROL = TIME_CONTROLS.find(tc => tc.id === '5m')!;
 
 const pieceValues: { [key: string]: number } = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
 
@@ -23,8 +24,8 @@ const useGameStore = create<GameStore>((set, get) => ({
   lastMove: null,
   promotionDialogOpen: false,
   promotionMove: null,
-  timerDuration: DEFAULT_TIMER_DURATION,
-  timers: { w: DEFAULT_TIMER_DURATION, b: DEFAULT_TIMER_DURATION },
+  timeControl: DEFAULT_TIME_CONTROL,
+  timers: { w: DEFAULT_TIME_CONTROL.initialTime, b: DEFAULT_TIME_CONTROL.initialTime },
   theme: 'theme-default',
   soundEnabled: true,
   soundVolume: 0.5,
@@ -43,9 +44,8 @@ const useGameStore = create<GameStore>((set, get) => ({
   setPieceStyle: (style: PieceStyle) => set({ pieceStyle: style }),
   setIsThinking: (isThinking: boolean) => set({ isThinking }),
   togglePause: () => set((state) => ({ isPaused: !state.isPaused })),
-  setTimerDuration: (duration: number) => {
-     const newDuration = duration === 0 ? Infinity : duration;
-    set({ timerDuration: newDuration, timers: { w: newDuration, b: newDuration } });
+  setTimeControl: (timeControl: TimeControl) => {
+    set({ timeControl });
     get().newGame();
   },
   setTheme: (theme: Theme) => set({ theme }),
@@ -60,7 +60,7 @@ const useGameStore = create<GameStore>((set, get) => ({
 
   newGame: () => {
     const newGame = new Chess();
-    const duration = get().timerDuration;
+    const { initialTime } = get().timeControl;
     soundManager.play('new-game');
     set({
       game: newGame,
@@ -70,7 +70,7 @@ const useGameStore = create<GameStore>((set, get) => ({
       isPaused: false,
       lastMove: null,
       promotionDialogOpen: false,
-      timers: { w: duration, b: duration },
+      timers: { w: initialTime, b: initialTime },
     });
   },
 
@@ -97,6 +97,9 @@ const useGameStore = create<GameStore>((set, get) => ({
     
     if (result) {
         const newGameState = get().getGameState(game);
+        const { timers, timeControl } = get();
+        const prevTurn = game.turn() === 'w' ? 'b' : 'w';
+
         set({
             fen: game.fen(),
             history: game.history({ verbose: true }) as Move[],
@@ -104,6 +107,10 @@ const useGameStore = create<GameStore>((set, get) => ({
             lastMove: { from: result.from, to: result.to },
             promotionDialogOpen: false,
             promotionMove: null,
+            timers: {
+                ...timers,
+                [prevTurn]: timers[prevTurn] + timeControl.increment,
+            }
         });
 
         if (get().soundEnabled) {
@@ -122,7 +129,7 @@ const useGameStore = create<GameStore>((set, get) => ({
   },
   
   tick: () => {
-    if (get().timerDuration === Infinity) return;
+    if (get().timeControl.initialTime === Infinity) return;
     
     set((state) => {
         if (state.isPaused || state.gameState !== 'ongoing') return {};
