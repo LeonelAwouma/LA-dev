@@ -5,7 +5,7 @@ import { soundManager } from '@/lib/chess-sounds';
 import { TimeControl, TIME_CONTROLS } from '@/lib/time-controls';
 
 const INITIAL_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
-const DEFAULT_TIME_CONTROL = TIME_CONTROLS.find(tc => tc.id === '5m')!;
+const DEFAULT_TIME_CONTROL = TIME_CONTROLS.find(tc => tc.id === '10m')!;
 
 const pieceValues: { [key: string]: number } = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
 
