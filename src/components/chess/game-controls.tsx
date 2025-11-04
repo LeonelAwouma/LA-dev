@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { difficulties, GameMode, Difficulty } from '@/types';
-import { Users, Bot, RefreshCw, Play, Pause, Palette, Settings, Timer } from 'lucide-react';
+import { Users, Bot, RefreshCw, Play, Pause, Settings, Timer } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Separator } from '../ui/separator';
 
@@ -124,7 +124,7 @@ export function GameControls() {
            <div className="space-y-2">
               <Label>Time Control</Label>
               <Select
-                value={timerDuration.toString()}
+                value={timerDuration === Infinity ? "0" : timerDuration.toString()}
                 onValueChange={(value) => setTimerDuration(parseInt(value))}
                 disabled={isThinking || isPaused}
               >
@@ -154,7 +154,7 @@ export function GameControls() {
         <CardHeader>
           <CardTitle>Game Actions</CardTitle>
         </CardHeader>
-        <CardContent className="grid grid-cols-2 gap-2">
+        <CardContent className="grid grid-cols-1 gap-2">
           <Button
             onClick={togglePause}
             disabled={gameState !== 'ongoing'}
@@ -166,10 +166,6 @@ export function GameControls() {
               <Pause className="mr-2 h-4 w-4" />
             )}
             {isPaused ? 'Resume' : 'Pause'}
-          </Button>
-          <Button variant="outline">
-            <Settings className="mr-2 h-4 w-4" />
-            Settings
           </Button>
         </CardContent>
       </Card>

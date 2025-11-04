@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { Chess, Piece, Square } from 'chess.js';
-import type { GameState, GameStore, Move, PieceStyle, GameMode, Player, Difficulty } from '@/types';
+import type { GameState, GameStore, Move, PieceStyle, GameMode, Player, Difficulty, Theme } from '@/types';
+import { soundManager } from '@/lib/chess-sounds';
 
 const INITIAL_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 const DEFAULT_TIMER_DURATION = 300; // 5 minutes
@@ -24,6 +25,9 @@ const useGameStore = create<GameStore>((set, get) => ({
   promotionMove: null,
   timerDuration: DEFAULT_TIMER_DURATION,
   timers: { w: DEFAULT_TIMER_DURATION, b: DEFAULT_TIMER_DURATION },
+  theme: 'theme-default',
+  soundEnabled: true,
+  soundVolume: 0.5,
 
   setGameMode: (mode: GameMode) => {
     set({ gameMode: mode });
@@ -44,10 +48,20 @@ const useGameStore = create<GameStore>((set, get) => ({
     set({ timerDuration: newDuration, timers: { w: newDuration, b: newDuration } });
     get().newGame();
   },
+  setTheme: (theme: Theme) => set({ theme }),
+  setSoundEnabled: (enabled: boolean) => {
+    set({ soundEnabled: enabled });
+    soundManager.toggleMute();
+  },
+  setSoundVolume: (volume: number) => {
+    set({ soundVolume: volume });
+    soundManager.setVolume(volume);
+  },
 
   newGame: () => {
     const newGame = new Chess();
     const duration = get().timerDuration;
+    soundManager.play('new-game');
     set({
       game: newGame,
       fen: newGame.fen(),
@@ -82,14 +96,27 @@ const useGameStore = create<GameStore>((set, get) => ({
     const result = game.move(move);
     
     if (result) {
-      set({
-        fen: game.fen(),
-        history: game.history({ verbose: true }) as Move[],
-        gameState: get().getGameState(game),
-        lastMove: { from: result.from, to: result.to },
-        promotionDialogOpen: false,
-        promotionMove: null,
-      });
+        const newGameState = get().getGameState(game);
+        set({
+            fen: game.fen(),
+            history: game.history({ verbose: true }) as Move[],
+            gameState: newGameState,
+            lastMove: { from: result.from, to: result.to },
+            promotionDialogOpen: false,
+            promotionMove: null,
+        });
+
+        if (get().soundEnabled) {
+            if (newGameState === 'checkmate') {
+                setTimeout(() => soundManager.play('victory'), 300);
+            } else if (result.san.includes('+')) {
+                soundManager.play('check');
+            } else if (result.captured) {
+                soundManager.play('capture');
+            } else {
+                soundManager.play('move');
+            }
+        }
     }
     return result;
   },
@@ -98,6 +125,8 @@ const useGameStore = create<GameStore>((set, get) => ({
     if (get().timerDuration === Infinity) return;
     
     set((state) => {
+        if (state.isPaused || state.gameState !== 'ongoing') return {};
+        
         const turn = state.game.turn();
         const newTime = state.timers[turn] - 1;
 

@@ -2,9 +2,8 @@ import ChessGame from '@/components/chess/chess-game';
 import { GameControls } from '@/components/chess/game-controls';
 import { MoveHistory } from '@/components/chess/move-history';
 import { Button } from '@/components/ui/button';
-import { Github, Languages, Settings } from 'lucide-react';
-import { PlayerInfo } from '@/components/chess/player-info';
-import useGameStore from '@/lib/store/game-store';
+import { Github } from 'lucide-react';
+import SettingsDialog from '@/components/chess/settings-dialog';
 
 
 export default function Home() {
@@ -16,12 +15,12 @@ export default function Home() {
           <h1 className="text-2xl font-bold font-headline">Chess</h1>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
-            <Github className="w-4 h-4" />
+          <Button variant="outline" size="icon" asChild>
+            <a href="https://github.com/firebase/studio-stockfish-champion-web" target="_blank">
+              <Github className="w-4 h-4" />
+            </a>
           </Button>
-          <Button variant="outline" size="sm">
-            <Settings className="w-4 h-4" />
-          </Button>
+          <SettingsDialog />
         </div>
       </header>
       <main className="flex-1 w-full p-4 md:p-8">

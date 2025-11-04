@@ -21,6 +21,22 @@ export type Player = {
 export const difficulties = [400, 800, 1200, 1600, 2000, 2500] as const;
 export type Difficulty = typeof difficulties[number];
 
+export type Theme =
+  | 'theme-default'
+  | 'theme-blue'
+  | 'theme-green'
+  | 'theme-red'
+  | 'theme-orange'
+  | 'theme-purple'
+  | 'theme-pink'
+  | 'theme-yellow'
+  | 'theme-cyan'
+  | 'theme-gray'
+  | 'theme-brown'
+  | 'theme-light'
+  | 'theme-dark'
+  | 'theme-mint';
+
 export interface GameStore {
   game: Chess;
   fen: string;
@@ -37,6 +53,9 @@ export interface GameStore {
   promotionMove: { from: Square; to: Square } | null;
   timerDuration: number;
   timers: { w: number, b: number };
+  theme: Theme;
+  soundEnabled: boolean;
+  soundVolume: number;
 
   setGameMode: (mode: GameMode) => void;
   setPlayerColor: (color: 'w' | 'b') => void;
@@ -47,6 +66,9 @@ export interface GameStore {
   setTimerDuration: (duration: number) => void;
   tick: () => void;
   getMaterialAdvantage: () => number;
+  setTheme: (theme: Theme) => void;
+  setSoundEnabled: (enabled: boolean) => void;
+  setSoundVolume: (volume: number) => void;
   
   newGame: () => void;
   makeMove: (move: string | { from: Square, to: Square, promotion?: string }) => Move | null;
