@@ -3,6 +3,10 @@ import { Chess, Piece, Square } from 'chess.js';
 import type { GameState, GameStore, Move, PieceStyle, GameMode, Player, Difficulty } from '@/types';
 
 const INITIAL_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+const DEFAULT_TIMER_DURATION = 300; // 5 minutes
+
+const pieceValues: { [key: string]: number } = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
+
 
 const useGameStore = create<GameStore>((set, get) => ({
   game: new Chess(),
@@ -18,6 +22,8 @@ const useGameStore = create<GameStore>((set, get) => ({
   lastMove: null,
   promotionDialogOpen: false,
   promotionMove: null,
+  timerDuration: DEFAULT_TIMER_DURATION,
+  timers: { w: DEFAULT_TIMER_DURATION, b: DEFAULT_TIMER_DURATION },
 
   setGameMode: (mode: GameMode) => {
     set({ gameMode: mode });
@@ -33,9 +39,15 @@ const useGameStore = create<GameStore>((set, get) => ({
   setPieceStyle: (style: PieceStyle) => set({ pieceStyle: style }),
   setIsThinking: (isThinking: boolean) => set({ isThinking }),
   togglePause: () => set((state) => ({ isPaused: !state.isPaused })),
+  setTimerDuration: (duration: number) => {
+     const newDuration = duration === 0 ? Infinity : duration;
+    set({ timerDuration: newDuration, timers: { w: newDuration, b: newDuration } });
+    get().newGame();
+  },
 
   newGame: () => {
     const newGame = new Chess();
+    const duration = get().timerDuration;
     set({
       game: newGame,
       fen: newGame.fen(),
@@ -44,27 +56,23 @@ const useGameStore = create<GameStore>((set, get) => ({
       isPaused: false,
       lastMove: null,
       promotionDialogOpen: false,
+      timers: { w: duration, b: duration },
     });
   },
 
   makeMove: (move: string | { from: Square; to: Square; promotion?: string }) => {
     const game = get().game;
     
-    // Validate the move before making it
     const legalMoves = game.moves({ verbose: true });
     const isMoveLegal = legalMoves.some(legalMove => {
       if (typeof move === 'string') {
-        // This handles both SAN ("Nf3") and UCI ("g1f3")
         return legalMove.san === move || `${legalMove.from}${legalMove.to}` === move;
       }
-      // This handles the object notation for moves
       return legalMove.from === move.from && legalMove.to === move.to;
     });
 
     if (!isMoveLegal) {
         console.warn("Illegal move attempted:", move);
-        // This specific check is to handle cases where chess.js doesn't automatically detect pawn promotions
-        // in its standard .moves() output, requiring us to manage the promotion UI flow.
         if (typeof move !== 'string' && get().isPromotion(move)) {
             get().openPromotionDialog(move.from, move.to);
         }
@@ -85,6 +93,23 @@ const useGameStore = create<GameStore>((set, get) => ({
     }
     return result;
   },
+  
+  tick: () => {
+    if (get().timerDuration === Infinity) return;
+    
+    set((state) => {
+        const turn = state.game.turn();
+        const newTime = state.timers[turn] - 1;
+
+        if (newTime <= 0) {
+            return {
+                timers: { ...state.timers, [turn]: 0 },
+                gameState: 'timeout',
+            };
+        }
+        return { timers: { ...state.timers, [turn]: newTime } };
+    });
+  },
 
   getGameState: (game: Chess): GameState => {
     if (game.isCheckmate()) return 'checkmate';
@@ -93,6 +118,21 @@ const useGameStore = create<GameStore>((set, get) => ({
     if (game.isInsufficientMaterial()) return 'draw_insufficient';
     if (game.isDraw()) return 'draw_50move';
     return 'ongoing';
+  },
+  
+  getMaterialAdvantage: () => {
+    const game = get().game;
+    const board = game.board();
+    let advantage = 0;
+    board.forEach(row => {
+        row.forEach(square => {
+            if (square) {
+                const value = pieceValues[square.type];
+                advantage += square.color === 'w' ? value : -value;
+            }
+        });
+    });
+    return advantage;
   },
 
   getLegalMoves: (square: Square) => {
@@ -111,7 +151,6 @@ const useGameStore = create<GameStore>((set, get) => ({
     const startRank = piece.color === 'w' ? '7' : '2';
 
     if (move.from[1] === startRank && move.to[1] === promotionRank) {
-       // Also check if the move is generally legal (ignoring promotion piece)
        const legalMoves = get().game.moves({square: move.from, verbose: true});
        return legalMoves.some(m => m.to === move.to);
     }

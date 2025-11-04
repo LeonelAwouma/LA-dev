@@ -5,7 +5,7 @@ export type { Square };
 
 export type PieceStyle = 'classic' | 'modern' | 'colorful';
 
-export type GameState = 'ongoing' | 'checkmate' | 'stalemate' | 'draw_repetition' | 'draw_insufficient' | 'draw_50move';
+export type GameState = 'ongoing' | 'checkmate' | 'stalemate' | 'draw_repetition' | 'draw_insufficient' | 'draw_50move' | 'timeout';
 
 export type Move = ChessJSMove;
 
@@ -35,6 +35,8 @@ export interface GameStore {
   lastMove: { from: Square; to: Square } | null;
   promotionDialogOpen: boolean;
   promotionMove: { from: Square; to: Square } | null;
+  timerDuration: number;
+  timers: { w: number, b: number };
 
   setGameMode: (mode: GameMode) => void;
   setPlayerColor: (color: 'w' | 'b') => void;
@@ -42,6 +44,9 @@ export interface GameStore {
   setPieceStyle: (style: PieceStyle) => void;
   setIsThinking: (isThinking: boolean) => void;
   togglePause: () => void;
+  setTimerDuration: (duration: number) => void;
+  tick: () => void;
+  getMaterialAdvantage: () => number;
   
   newGame: () => void;
   makeMove: (move: string | { from: Square, to: Square, promotion?: string }) => Move | null;

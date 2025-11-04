@@ -11,15 +11,16 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
-      <header className="flex items-center justify-between p-4 border-b">
+       <header className="flex items-center justify-between p-4 border-b shrink-0">
         <div className="flex items-center gap-4">
-          <h1 className="text-2xl font-bold font-headline">Chess Game</h1>
+          <h1 className="text-2xl font-bold font-headline">Chess</h1>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm"><Languages className="w-4 h-4 mr-2" />EN</Button>
           <Button variant="outline" size="sm">
-            <Github className="w-4 h-4 mr-2" />
-            GitHub
+            <Github className="w-4 h-4" />
+          </Button>
+          <Button variant="outline" size="sm">
+            <Settings className="w-4 h-4" />
           </Button>
         </div>
       </header>

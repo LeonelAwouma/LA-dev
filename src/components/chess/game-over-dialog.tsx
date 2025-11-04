@@ -10,14 +10,15 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Trophy, Users } from 'lucide-react';
+import { Trophy, Users, Timer } from 'lucide-react';
 
 export function GameOverDialog() {
-  const { gameState, newGame, game } = useGameStore();
+  const { gameState, newGame, game, getMaterialAdvantage } = useGameStore();
   const isOpen = gameState !== 'ongoing';
 
   const getTitleAndDescription = () => {
-    const winner = game.turn() === 'b' ? 'White' : 'Black';
+    const turn = game.turn();
+    const winner = turn === 'b' ? 'White' : 'Black';
     switch (gameState) {
       case 'checkmate':
         return {
@@ -25,6 +26,21 @@ export function GameOverDialog() {
           description: `${winner} wins by checkmate.`,
           Icon: Trophy,
         };
+       case 'timeout':
+        const advantage = getMaterialAdvantage();
+        const timeoutWinner = advantage > 0 ? 'White' : advantage < 0 ? 'Black' : null;
+        if (timeoutWinner) {
+          return {
+            title: 'Timeout!',
+            description: `${winner} ran out of time. ${timeoutWinner} wins on material advantage (${Math.abs(advantage)}).`,
+            Icon: Trophy,
+          };
+        }
+        return {
+            title: 'Timeout!',
+            description: `${winner} ran out of time. The game is a draw.`,
+            Icon: Users,
+        }
       case 'stalemate':
         return {
           title: 'Stalemate!',
